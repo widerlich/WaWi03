@@ -119,7 +119,7 @@ public class WaWiApp extends Application {
 			}catch(Exception e) {
 	            e.printStackTrace();
 			}
-			posDialog.setState(AppStates.CHECKOUT);
+			posDialog.setState(AppStates.KUNDENAUSWAHL);
 			posDialog.show();
 		};
 		

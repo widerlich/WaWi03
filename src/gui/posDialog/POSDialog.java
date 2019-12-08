@@ -199,7 +199,7 @@ public class POSDialog {
 				}
 			} break;
 			
-			case AppStates.CHECKOUT: {
+			default: {
 				wahlKunde.setDisable(false);
 				setDefaultKunde(); // reset in "bitte auswählen"
 				checkout.setDisable(true);
