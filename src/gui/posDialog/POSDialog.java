@@ -92,6 +92,9 @@ public class POSDialog {
 		GridPane.setHalignment(auswahl, HPos.CENTER);
 		GridPane.setValignment(auswahl, VPos.TOP);
 		this.wahlKunde = auswahl;
+		for (Kunde k : kunden) {
+			auswahl.getItems().add(k.getName());
+		}
 		setDefaultKunde();
 		
 		// label
@@ -179,6 +182,8 @@ public class POSDialog {
 		
 		switch(myState) {
 			case AppStates.KUNDENAUSWAHL: {
+				setDefaultKunde();
+				this.rechnungsText.setText("");
 				wahlKunde.setDisable(false);
 				checkout.setDisable(true);
 				anzeige.setDisable(true);
@@ -196,16 +201,6 @@ public class POSDialog {
 						p.setDisable(false);
 					else
 						p.setDisable(true);
-				}
-			} break;
-			
-			case AppStates.CHECKOUT: {
-				wahlKunde.setDisable(false);
-				setDefaultKunde(); // reset in "bitte auswählen"
-				checkout.setDisable(true);
-				anzeige.setDisable(true);
-				for (ProduktButton p : pOptions) {
-					p.setDisable(true);
 				}
 			} break;
 		}
@@ -263,11 +258,26 @@ public class POSDialog {
 	}
 	
 	
+	// FIX THIS SHIT!
+	public void disableButton(ProduktButton p, int anz) {
+		//System.out.println("Ich war hier und die if ist nicht angesprungen.");
+		if(checkLagerbestand(p.getProdukt(), anz) == false){
+			//System.out.println("Ich war hier und hab aber nix gemacht.");
+			for (ProduktButton but : pOptions) {
+				if(but.getProdukt().equals(p.getProdukt())) {
+					but.setDisable(true);
+				}
+			}
+			//int x = pOptions.indexOf(p);
+			//pOptions.get(x).setDisable(true);
+			stage.show();
+		}
+	}
+	
 	// helper methods
 	
 	private void setDefaultKunde() {
 		for (Kunde k : kunden) {
-			wahlKunde.getItems().add(k.getName());
 			if(k.getNummer() == -1) {
 				//set default
 				wahlKunde.setValue(k.getName());
@@ -275,8 +285,15 @@ public class POSDialog {
 		}
 	}
 	
-	private boolean checkLagerbestand(Produkt p) {
+	public boolean checkLagerbestand(Produkt p) {
 		if(p instanceof Artikel && ((Artikel) p).getLagerbestand() == 0)
+			return false;
+		else
+			return true;
+	}
+	
+	public boolean checkLagerbestand(Produkt p, int anz) {
+		if(p instanceof Artikel && ((Artikel) p).getLagerbestand() - anz <= 0)
 			return false;
 		else
 			return true;

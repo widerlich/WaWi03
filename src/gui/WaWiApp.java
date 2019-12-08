@@ -106,6 +106,8 @@ public class WaWiApp extends Application {
 			try {
 				re.addRechnungsposition(1, prod);
 			}catch(Exception e) {
+				int x = re.getRechnungsposition(prod).getAnzahl();
+				posDialog.disableButton(p, x);
 				e.printStackTrace();
 			}
 			posDialog.setLabel(re.toString());
@@ -115,11 +117,18 @@ public class WaWiApp extends Application {
 		POSDialogCheckoutHandler checkoutHandler = () ->
 		{	
 			try {
+				/*for (Produkt a : produkte) {
+					System.out.println(a);
+				}*/
 				re.buchen();
+				/*for (Produkt a : produkte) {
+					System.out.println(a);
+				}*/
+				
 			}catch(Exception e) {
 	            e.printStackTrace();
 			}
-			posDialog.setState(AppStates.CHECKOUT);
+			posDialog.setState(AppStates.KUNDENAUSWAHL);
 			posDialog.show();
 		};
 		
