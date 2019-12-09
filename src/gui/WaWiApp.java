@@ -71,7 +71,7 @@ public class WaWiApp extends Application {
 		try{
 			posDialog = new POSDialog(produkte, kunden);
 			loginDialog = new LoginDialog();
-			loginDialog.show();
+			showLoginDialog();
 		}catch(Exception e) {
             e.printStackTrace();
 		}
@@ -177,7 +177,7 @@ public class WaWiApp extends Application {
 				//WaWiApp.showLagerDialog(); --> kommt noch
 			}
 			else{
-				loginDialog = new LoginDialog();
+				loginDialog.resetUserPW();
 				loginDialog.setError("Ungueltige Benutzername/Passwort-Kombination!", true);
 			}
 			
