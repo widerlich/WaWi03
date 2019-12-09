@@ -94,6 +94,7 @@ public class WaWiApp extends Application {
 	private void showPOSDialog() {
 		POSDialogCloseHandler closeHandler = () -> {
 			posDialog.hide();
+			loginDialog.show();
 		};
 		
 		POSDialogKundenauswahlHandler kundenHandler = (Kunde k) -> {
@@ -171,10 +172,14 @@ public class WaWiApp extends Application {
 				loginDialog.setError("POS Login korrekt", false);
 				posDialog.setState(AppStates.KUNDENAUSWAHL);
 				this.showPOSDialog();
+				loginDialog.resetUserPW();
+				loginDialog.hide();
 			}
 			else if (user.equals(USER_LAGER) && pw.equals(PW_LAGER)){
 				loginDialog.setError("Lager-Login korrekt", false);
 				//WaWiApp.showLagerDialog(); --> kommt noch
+				loginDialog.resetUserPW();
+				loginDialog.hide();
 			}
 			else{
 				loginDialog.resetUserPW();
