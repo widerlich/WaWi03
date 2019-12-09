@@ -3,7 +3,6 @@ import java.util.LinkedList;
 import java.util.List;
 import gui.AppStates;
 import geschaeftsobjekte.Artikel;
-import geschaeftsobjekte.Dienstleistung;
 import geschaeftsobjekte.Kunde;
 import geschaeftsobjekte.Produkt;
 
@@ -207,7 +206,7 @@ public class POSDialog {
 		
 		stage.show();
 		
-	}
+	}	
 
 	/**
 	 * Verbirgt den Dialog
@@ -215,6 +214,8 @@ public class POSDialog {
 	public void hide() {
 		// reset all fields
 		this.initDialog();
+		// call loginDialogue from here or from WaWiApp?
+		// at least give some trigger here... ?
 	}	
 	
 	

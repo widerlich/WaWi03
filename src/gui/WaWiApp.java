@@ -4,22 +4,26 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import exceptions.BookingException;
-import exceptions.OutOfStockException;
 import geschaeftsobjekte.Artikel;
 import geschaeftsobjekte.Dienstleistung;
 import geschaeftsobjekte.Kunde;
 import geschaeftsobjekte.Produkt;
 import geschaeftsobjekte.Rechnung;
-import geschaeftsobjekte.Rechnungsposition;
+
 import gui.posDialog.POSDialog;
 import gui.posDialog.POSDialogCheckoutHandler;
 import gui.posDialog.POSDialogCloseHandler;
 import gui.posDialog.POSDialogKundenauswahlHandler;
 import gui.posDialog.POSDialogProduktButtonHandler;
+
+import gui.loginDialog.LoginDialog;
+import gui.loginDialog.LoginHandler;
+
 import gui.posDialog.ProduktButton;
 import javafx.application.Application;
 import javafx.stage.Stage;
+
+
 
 /**
  * Startet die Dialoge der Anwendung und definiert für jeden Dialog
@@ -42,10 +46,18 @@ public class WaWiApp extends Application {
 	private List<Kunde> kunden;
 	private Rechnung re;
 	
+	// passwords from database
+	private static final String USER_KASSE = "Hugo";	
+	private static final String PW_KASSE = "123";
+	private static final String USER_LAGER = "Admin";	
+	private static final String PW_LAGER = "123";
+	
 	/**
 	 * Dialoge der App
 	 */
 	private POSDialog posDialog;
+	private LoginDialog loginDialog;
+	private int status;
 	
 	static public void main(String[] args) {
 		launch(args); // Anwendung starten
@@ -55,12 +67,14 @@ public class WaWiApp extends Application {
 	public void start(Stage stage) throws Exception {
 		produkte = initialisiereProdukte();
 		kunden = initialisiereKunden();
-		try {
+		
+		try{
 			posDialog = new POSDialog(produkte, kunden);
+			loginDialog = new LoginDialog();
+			loginDialog.show();
 		}catch(Exception e) {
             e.printStackTrace();
 		}
-		showPOSDialog();
 	}
 
 	/**
@@ -78,7 +92,6 @@ public class WaWiApp extends Application {
 	 *   Die Lambdas werden hier definiert und dem POSDialog bekannt gemacht (per Setter-Aufruf)
 	 */
 	private void showPOSDialog() {
-		
 		POSDialogCloseHandler closeHandler = () -> {
 			posDialog.hide();
 		};
@@ -138,6 +151,40 @@ public class WaWiApp extends Application {
 		posDialog.setProduktButtonHandler(produktHandler);
 		
 		posDialog.show();
+	}
+	
+	// show login dialog
+	public void showLoginDialog() {
+		LoginHandler login = (String user , String pw) -> {
+			
+			if(user.trim().isEmpty())
+			{
+				loginDialog.resetUserPW();
+				loginDialog.setError("Bitte geben Sie einen Benutzernamen ein!", true);			
+			}
+			else if(pw.trim().isEmpty()){
+				loginDialog.resetUserPW();
+				loginDialog.setError("Bitte geben Sie ein Passwort ein!", true);			
+			}
+			else if (user.equals(USER_KASSE) && pw.equals(PW_KASSE))
+			{
+				loginDialog.setError("POS Login korrekt", false);
+				posDialog.setState(AppStates.KUNDENAUSWAHL);
+				this.showPOSDialog();
+			}
+			else if (user.equals(USER_LAGER) && pw.equals(PW_LAGER)){
+				loginDialog.setError("Lager-Login korrekt", false);
+				//WaWiApp.showLagerDialog(); --> kommt noch
+			}
+			else{
+				loginDialog = new LoginDialog();
+				loginDialog.setError("Ungueltige Benutzername/Passwort-Kombination!", true);
+			}
+			
+		};
+		
+		loginDialog.setLoginHandler(login);
+		loginDialog.show();
 	}
 
 	/**
