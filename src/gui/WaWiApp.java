@@ -4,49 +4,61 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import exceptions.BookingException;
-import exceptions.OutOfStockException;
 import geschaeftsobjekte.Artikel;
 import geschaeftsobjekte.Dienstleistung;
 import geschaeftsobjekte.Kunde;
 import geschaeftsobjekte.Produkt;
 import geschaeftsobjekte.Rechnung;
-import geschaeftsobjekte.Rechnungsposition;
+
 import gui.posDialog.POSDialog;
 import gui.posDialog.POSDialogCheckoutHandler;
 import gui.posDialog.POSDialogCloseHandler;
 import gui.posDialog.POSDialogKundenauswahlHandler;
 import gui.posDialog.POSDialogProduktButtonHandler;
+
+import gui.loginDialog.LoginDialog;
+import gui.loginDialog.LoginHandler;
+
 import gui.posDialog.ProduktButton;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
+
+
 /**
- * Startet die Dialoge der Anwendung und definiert für jeden Dialog
- * die Handler-Methoden (=Lambdas) für die Behandlung der Ereignisse des 
- * Dialogs. 
- * Tritt ein Ereignis auf, ruft der Dialog den hier definierten 
+ * Startet die Dialoge der Anwendung und definiert fï¿½r jeden Dialog
+ * die Handler-Methoden (=Lambdas) fï¿½r die Behandlung der Ereignisse des
+ * Dialogs.
+ * Tritt ein Ereignis auf, ruft der Dialog den hier definierten
  * Handler auf. Dadurch entsteht eine Trennung (Modularisierung) zwischen
- * den Klassen der Benutzeroberfläche und der Ereignisbehandlung (diese Datei).
- * Vorteile sind die getrennte Testbarkeit der Ereignisbehandlung sowie 
+ * den Klassen der Benutzeroberflï¿½che und der Ereignisbehandlung (diese Datei).
+ * Vorteile sind die getrennte Testbarkeit der Ereignisbehandlung sowie
  * der minimierte Aufwand beim Umstieg auf eine andere UI-Technologie. Letzteres
- * ergibt sich daraus, dass die geschäftslogik-Klassen keine Abhängigkeiten 
- * zum UI-Framework (hier: JavaFX) besitzen (siehe Imports in dieser Datei). 
- * 
+ * ergibt sich daraus, dass die geschï¿½ftslogik-Klassen keine Abhï¿½ngigkeiten
+ * zum UI-Framework (hier: JavaFX) besitzen (siehe Imports in dieser Datei).
+ *
  */
 public class WaWiApp extends Application {
 	/**
-	 * Benötigte Daten: Produkte und Kunden
+	 * Benï¿½tigte Daten: Produkte und Kunden
 	 */
 	private List<Produkt> produkte;
 	private List<Kunde> kunden;
 	private Rechnung re;
-	
+
+	// passwords from database
+	private static final String USER_KASSE = "Hugo";
+	private static final String PW_KASSE = "123";
+	private static final String USER_LAGER = "Admin";
+	private static final String PW_LAGER = "123";
+
 	/**
 	 * Dialoge der App
 	 */
 	private POSDialog posDialog;
-	
+	private LoginDialog loginDialog;
+	private int status;
+
 	static public void main(String[] args) {
 		launch(args); // Anwendung starten
 	}
@@ -55,7 +67,8 @@ public class WaWiApp extends Application {
 	public void start(Stage stage) throws Exception {
 		produkte = initialisiereProdukte();
 		kunden = initialisiereKunden();
-		try {
+
+		try{
 			posDialog = new POSDialog(produkte, kunden);
 			loginDialog = new LoginDialog();
 			showLoginDialog();
@@ -63,16 +76,15 @@ public class WaWiApp extends Application {
 		}catch(Exception e) {
             e.printStackTrace();
 		}
-		showPOSDialog();
 	}
 
 	/**
-	 * Erzeugt eine Instanz von POSDialog, setzt für diese die benötigten 
+	 * Erzeugt eine Instanz von POSDialog, setzt fï¿½r diese die benï¿½tigten
 	 * Ereignis-Handler und zeigt den Dialog an.
 	 * Aufgabenteilung:
 	 * - POSDialog zeigt den Dialog an und erlaubt Eingaben
-	 * - die Reaktion auf Eingaben wird *hier* vorgenommen, 
-	 *   indem entsprechende Lambda-Ausdrücke definiert werden, 
+	 * - die Reaktion auf Eingaben wird *hier* vorgenommen,
+	 *   indem entsprechende Lambda-Ausdrï¿½cke definiert werden,
 	 *   die zu den geforderten Interfaces passen:
 	 * 		- Kundenauswahl (Interface POSDialogKundenauswahlHandler)
 	 * 		- Checkoutbutton geklickt (Interface POSDialogCheckoutHandler)
@@ -81,11 +93,10 @@ public class WaWiApp extends Application {
 	 *   Die Lambdas werden hier definiert und dem POSDialog bekannt gemacht (per Setter-Aufruf)
 	 */
 	private void showPOSDialog() {
-		
 		POSDialogCloseHandler closeHandler = () -> {
 			posDialog.hide();
 		};
-		
+
 		POSDialogKundenauswahlHandler kundenHandler = (Kunde k) -> {
 			if(posDialog.getState() == AppStates.KUNDENAUSWAHL) {
 				if(k.getNummer() == 0) {
@@ -102,63 +113,106 @@ public class WaWiApp extends Application {
 				}
 			}
 		};
-		
+
 		POSDialogProduktButtonHandler produktHandler = (ProduktButton p) ->
 		{
 			Produkt prod = p.getProdukt();
 			try {
 				re.addRechnungsposition(1, prod);
 			}catch(Exception e) {
+				int x = re.getRechnungsposition(prod).getAnzahl();
+				posDialog.disableButton(p, x);
 				e.printStackTrace();
 			}
 			posDialog.setLabel(re.toString());
 			posDialog.show();
 		};
-		
+
 		POSDialogCheckoutHandler checkoutHandler = () ->
-		{	
+		{
 			try {
+				/*for (Produkt a : produkte) {
+					System.out.println(a);
+				}*/
 				re.buchen();
+				/*for (Produkt a : produkte) {
+					System.out.println(a);
+				}*/
+
 			}catch(Exception e) {
 	            e.printStackTrace();
 			}
 			posDialog.setState(AppStates.KUNDENAUSWAHL);
 			posDialog.show();
 		};
-		
+
 		posDialog.setCloseHandler(closeHandler);
 		posDialog.setCheckoutHandler(checkoutHandler);
 		posDialog.setKundenauswahlHandler(kundenHandler);
 		posDialog.setProduktButtonHandler(produktHandler);
-		
+
 		posDialog.show();
 	}
 
+	// show login dialog
+	public void showLoginDialog() {
+		LoginHandler login = (String user , String pw) -> {
+
+			if(user.trim().isEmpty())
+			{
+				loginDialog.resetUserPW();
+				loginDialog.setError("Bitte geben Sie einen Benutzernamen ein!", true);
+			}
+			else if(pw.trim().isEmpty()){
+				loginDialog.resetUserPW();
+				loginDialog.setError("Bitte geben Sie ein Passwort ein!", true);
+			}
+			else if (user.equals(USER_KASSE) && pw.equals(PW_KASSE))
+			{
+				loginDialog.setError("POS Login korrekt", false);
+				posDialog.setState(AppStates.KUNDENAUSWAHL);
+				this.showPOSDialog();
+			}
+			else if (user.equals(USER_LAGER) && pw.equals(PW_LAGER)){
+				loginDialog.setError("Lager-Login korrekt", false);
+				//WaWiApp.showLagerDialog(); --> kommt noch
+			}
+			else{
+				loginDialog = new LoginDialog();
+				loginDialog.setError("Ungueltige Benutzername/Passwort-Kombination!", true);
+			}
+
+		};
+
+		loginDialog.setLoginHandler(login);
+		loginDialog.show();
+	}
+
 	/**
-	 * Erzeugt und initialisiert eine Kundenliste und gibt diese zurück
+	 * Erzeugt und initialisiert eine Kundenliste und gibt diese zurï¿½ck
 	 * @return Kundenliste
 	 */
 	private List<Kunde> initialisiereKunden() {
 		List<Kunde> kunden = new ArrayList<>();
-		
-		kunden.add(new Kunde(-1, "<bitte auswählen>", "", ""));
+
+		kunden.add(new Kunde(-1, "<bitte auswï¿½hlen>", "", ""));
 		kunden.add(new Kunde(0, "Barverkauf", "", ""));
 		kunden.add(new Kunde(1, "Madonna", "Sunset Boulevard 1", "Hollywood"));
-		kunden.add(new Kunde(2, "Heidi Klum", "Modelwalk 13", "L.A."));				
+		kunden.add(new Kunde(2, "Heidi Klum", "Modelwalk 13", "L.A."));
 
 		return kunden;
 	}
-	
+
 	/**
-	 * Erzeugt und initialisiert eine Produktliste und gibt diese zurück
+	 * Erzeugt und initialisiert eine Produktliste und gibt diese zurï¿½ck
 	 * @return Produktliste
 	 */
 	private List<Produkt> initialisiereProdukte() {
 		List<Produkt> produkte = new LinkedList<>();
-		
+
 		Artikel p1 = new Artikel(12345, "Arbeitsplatte A1", 89.90);
 		p1.einlagern(0);
-		Dienstleistung p2 = new Dienstleistung(100, "Küchenmontage", 75., "h");
+		Dienstleistung p2 = new Dienstleistung(100, "Kï¿½chenmontage", 75., "h");
 		Artikel p3 = new Artikel(98989876, "Akku-Handsauger", 129.90);
 		p3.einlagern(3);
 		Artikel p4 = new Artikel(5261, "Spax 6x100", 3.99);
@@ -187,7 +241,7 @@ public class WaWiApp extends Application {
 		produkte.add(p9);
 		produkte.add(p10);
 		produkte.add(p11);
-		
+
 		return produkte;
 	}
 

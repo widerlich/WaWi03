@@ -61,16 +61,18 @@ public class Rechnung extends Geschaeftsobjekt {
 				
 				//Liste ist nicht leer
 				for(int i = 0; i < positionen.size(); i++) {
-					Artikel art = (Artikel)positionen.get(i).getProdukt();
-					if(p.equals(art)){
-						int menge = positionen.get(i).getAnzahl();
-						if(art.getLagerbestand() >= menge+anzahl) {
-							positionen.get(i).setAnzahl(menge+anzahl);
+					if(positionen.get(i).getProdukt() instanceof Artikel) {	
+						Artikel art = (Artikel)(positionen.get(i).getProdukt());
+						if(p.equals(art)){
+							int menge = positionen.get(i).getAnzahl();
+							if(art.getLagerbestand() >= menge+anzahl) {
+								positionen.get(i).setAnzahl(menge+anzahl);
+							}
+							else {
+								throw new OutOfStockException("Kein ausreichender Lagerbestand von " + p, p);
+							}
+							return positionen.get(i);
 						}
-						else {
-							throw new OutOfStockException("Kein ausreichender Lagerbestand von " + p, p);
-						}
-						return positionen.get(i);
 					}
 				}
 				positionen.add(pos);
