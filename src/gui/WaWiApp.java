@@ -57,6 +57,9 @@ public class WaWiApp extends Application {
 		kunden = initialisiereKunden();
 		try {
 			posDialog = new POSDialog(produkte, kunden);
+			loginDialog = new LoginDialog();
+			showLoginDialog();
+			loginDialog.show();
 		}catch(Exception e) {
             e.printStackTrace();
 		}
