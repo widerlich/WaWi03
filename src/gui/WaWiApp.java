@@ -120,8 +120,10 @@ public class WaWiApp extends Application {
 			Produkt prod = p.getProdukt();
 			try {
 				re.addRechnungsposition(1, prod);
+				if(posDialog.checkLagerbestand(prod, re.getRechnungsposition(prod).getAnzahl())) {
+					p.setDisable(true);
+				}
 			}catch(Exception e) {
-				p.setDisable(true);
 				System.out.println(e.getMessage());
 			}
 			posDialog.setLabel(re.toString());

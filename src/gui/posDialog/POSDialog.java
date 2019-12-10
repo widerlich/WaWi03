@@ -274,6 +274,13 @@ public class POSDialog {
 		else
 			return true;
 	}	
+	
+	public boolean checkLagerbestand(Produkt p, int anz) {
+		if(p instanceof Artikel && ((Artikel) p).getLagerbestand()-anz > 0)
+			return false;
+		else
+			return true;
+	}
 }
 
 
