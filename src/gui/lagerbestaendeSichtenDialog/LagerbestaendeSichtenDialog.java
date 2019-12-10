@@ -2,11 +2,10 @@ package gui.lagerbestaendeSichtenDialog;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import geschaeftsobjekte.Artikel;
 import geschaeftsobjekte.Produkt;
-// import gui.lagerbestandBearbeitenDialog.LagerbestandBearbeitenDialog; --> to be done
+import gui.lagerbestandBearbeitenDialog.LagerbestandBearbeitenDialog;
 import gui.lagerbestandBearbeitenDialog.LagerbestandBearbeitenDialogCloseHandler;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,8 +16,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.BorderPane;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class LagerbestaendeSichtenDialog {
@@ -27,13 +24,33 @@ public class LagerbestaendeSichtenDialog {
 	private LagerbestaendeSichtenDialogCloseHandler closeHandler;
 
 	public LagerbestaendeSichtenDialog(List<Produkt> produkte) {
-		// hier bitte eigenen Code einfügen
 		
-		List<Artikel> artikel = null; // bitte anpassen!
-		Node tabelle = initTabelle(artikel);
-
-		// hier bitte eigenen Code einfügen
+		// fill list with all available articles
+		List<Artikel> artikel = new LinkedList<Artikel>(); 
+		for(Produkt p : produkte) {
+			if(p instanceof Artikel && p != null) {
+				artikel.add((Artikel)p);
+			}
+		}
+		artikel.sort(null);
 		
+		// set GUI elements
+		this.stage = new Stage();
+		stage.setTitle("Lagerbestände verwalten");
+		
+		try{
+			Node tabelle = initTabelle(artikel);
+			((TableView)tabelle).prefHeightProperty().bind(stage.heightProperty());
+			((TableView)tabelle).prefWidthProperty().bind(stage.widthProperty());
+			Scene scene = new Scene((TableView) tabelle, 400, 400);
+			stage.setScene(scene);
+		}catch(Exception e) {
+			System.out.println(e.getMessage());
+		}
+		
+		stage.setOnCloseRequest(e -> {
+			closeHandler.close();
+		});
 	}
 	
 	public void setCloseHandler(LagerbestaendeSichtenDialogCloseHandler handler) {
@@ -41,7 +58,7 @@ public class LagerbestaendeSichtenDialog {
 	}
 	
 	public void show() {
-		stage.showAndWait();
+		stage.show(); 		//AndWait();
 	}
 	
 	public void hide() {
@@ -89,9 +106,7 @@ public class LagerbestaendeSichtenDialog {
             TableRow<Artikel> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2) {
-
-                	// hier bitte eigenen Code einfügen
-            		
+                	showLagerbestandBearbeitenDialog(row.getItem());
                 }
             });
             return row ;
@@ -107,7 +122,17 @@ public class LagerbestaendeSichtenDialog {
 	 * @param selektierterArtikel Artikel, dessen Lagerbestand aktualisiert werden soll
 	 */
 	private void showLagerbestandBearbeitenDialog(Artikel selektierterArtikel) {
-		// hier bitte eigenen Code einfügen
 		
+		LagerbestandBearbeitenDialogCloseHandler handler = (int neu) -> {
+			if(neu > 0) {
+				selektierterArtikel.einlagern(neu);
+				tableView.refresh();	
+			}
+		};
+		
+		LagerbestandBearbeitenDialog dialog = new LagerbestandBearbeitenDialog(selektierterArtikel);
+		dialog.setCloseHandler(handler);
+		dialog.show();
 	}
+	
 }

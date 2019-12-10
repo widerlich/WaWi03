@@ -201,6 +201,7 @@ public class POSDialog {
 					else
 						p.setDisable(true);
 				}
+				
 			} break;
 		}
 		
@@ -212,10 +213,8 @@ public class POSDialog {
 	 * Verbirgt den Dialog
 	 */
 	public void hide() {
-		// reset all fields
-		this.initDialog();
-		// call loginDialogue from here or from WaWiApp?
-		// at least give some trigger here... ?
+		this.initDialog(); // reset all fields
+		stage.hide();
 	}	
 	
 	
@@ -258,23 +257,6 @@ public class POSDialog {
 		this.anzeige.setContent(rechnungsText);
 	}
 	
-	
-	// FIX THIS SHIT!
-	public void disableButton(ProduktButton p, int anz) {
-		//System.out.println("Ich war hier und die if ist nicht angesprungen.");
-		if(checkLagerbestand(p.getProdukt(), anz) == false){
-			//System.out.println("Ich war hier und hab aber nix gemacht.");
-			for (ProduktButton but : pOptions) {
-				if(but.getProdukt().equals(p.getProdukt())) {
-					but.setDisable(true);
-				}
-			}
-			//int x = pOptions.indexOf(p);
-			//pOptions.get(x).setDisable(true);
-			stage.show();
-		}
-	}
-	
 	// helper methods
 	
 	private void setDefaultKunde() {
@@ -291,15 +273,7 @@ public class POSDialog {
 			return false;
 		else
 			return true;
-	}
-	
-	public boolean checkLagerbestand(Produkt p, int anz) {
-		if(p instanceof Artikel && ((Artikel) p).getLagerbestand() - anz <= 0)
-			return false;
-		else
-			return true;
-	}
-	
+	}	
 }
 
 

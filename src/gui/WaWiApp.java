@@ -15,7 +15,10 @@ import gui.posDialog.POSDialogCheckoutHandler;
 import gui.posDialog.POSDialogCloseHandler;
 import gui.posDialog.POSDialogKundenauswahlHandler;
 import gui.posDialog.POSDialogProduktButtonHandler;
-
+import gui.lagerbestaendeSichtenDialog.LagerbestaendeSichtenDialog;
+import gui.lagerbestaendeSichtenDialog.LagerbestaendeSichtenDialogCloseHandler;
+import gui.lagerbestandBearbeitenDialog.LagerbestandBearbeitenDialog;
+import gui.lagerbestandBearbeitenDialog.LagerbestandBearbeitenDialogCloseHandler;
 import gui.loginDialog.LoginDialog;
 import gui.loginDialog.LoginHandler;
 
@@ -57,10 +60,10 @@ public class WaWiApp extends Application {
 	 */
 	private POSDialog posDialog;
 	private LoginDialog loginDialog;
-	private int status;
+	private LagerbestaendeSichtenDialog lagerDialog;
 	
 	static public void main(String[] args) {
-		launch(args); // Anwendung starten
+		launch(args); 
 	}
 
 	@Override
@@ -71,9 +74,11 @@ public class WaWiApp extends Application {
 		try{
 			posDialog = new POSDialog(produkte, kunden);
 			loginDialog = new LoginDialog();
+			lagerDialog = new LagerbestaendeSichtenDialog(produkte);
 			showLoginDialog();
+			
 		}catch(Exception e) {
-            e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
 	}
 
@@ -120,12 +125,12 @@ public class WaWiApp extends Application {
 			try {
 				re.addRechnungsposition(1, prod);
 			}catch(Exception e) {
-				int x = re.getRechnungsposition(prod).getAnzahl();
-				posDialog.disableButton(p, x);
-				e.printStackTrace();
+				p.setDisable(true);
+				System.out.println(e.getMessage());
 			}
 			posDialog.setLabel(re.toString());
-			posDialog.show();
+			//posDialog.show();
+			
 		};
 		
 		POSDialogCheckoutHandler checkoutHandler = () ->
@@ -140,7 +145,7 @@ public class WaWiApp extends Application {
 				}*/
 				
 			}catch(Exception e) {
-	            e.printStackTrace();
+				System.out.println(e.getMessage());
 			}
 			posDialog.setState(AppStates.KUNDENAUSWAHL);
 			posDialog.show();
@@ -172,13 +177,11 @@ public class WaWiApp extends Application {
 				loginDialog.setError("POS Login korrekt", false);
 				posDialog.setState(AppStates.KUNDENAUSWAHL);
 				this.showPOSDialog();
-				loginDialog.resetUserPW();
 				loginDialog.hide();
 			}
 			else if (user.equals(USER_LAGER) && pw.equals(PW_LAGER)){
 				loginDialog.setError("Lager-Login korrekt", false);
-				//WaWiApp.showLagerDialog(); --> kommt noch
-				loginDialog.resetUserPW();
+				showLagerDialog();
 				loginDialog.hide();
 			}
 			else{
@@ -190,6 +193,18 @@ public class WaWiApp extends Application {
 		
 		loginDialog.setLoginHandler(login);
 		loginDialog.show();
+	}
+	
+	// show stock dialogue
+	public void showLagerDialog() {
+		LagerbestaendeSichtenDialogCloseHandler closeHandler = () -> {
+			loginDialog.resetUserPW();
+			loginDialog.show();
+			lagerDialog.hide();
+		};
+		
+		lagerDialog.setCloseHandler(closeHandler);
+		lagerDialog.show();
 	}
 
 	/**

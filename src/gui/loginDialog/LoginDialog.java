@@ -43,7 +43,7 @@ public class LoginDialog {
 		FlowPane fpU = new FlowPane();
 		Label userLabel = new Label("Benutzername:");
 		userLabel.setPadding(new Insets(10, 10, 10, 10));
-		userField = new TextField();
+		userField = new TextField();		
 		fpU.getChildren().addAll(userLabel, userField);
 		fpU.setAlignment(Pos.CENTER);
 		loginPane.setTop(fpU);
@@ -80,6 +80,16 @@ public class LoginDialog {
 		stage.setWidth(400);
 		stage.setScene(scene);
 		show();
+		
+		// add listener for error removal
+		
+		userField.setOnKeyReleased(e -> {
+			errorText.setText("");
+		});
+		
+		pwField.setOnKeyReleased(e -> {
+			errorText.setText("");
+		});
 		
 		// add listener for input evalutation
 		

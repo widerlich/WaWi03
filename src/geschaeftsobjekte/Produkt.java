@@ -19,7 +19,7 @@ abstract public class Produkt extends Geschaeftsobjekt implements Comparable<Pro
 		if (!(o instanceof Produkt)) { 
             return false; 
         }
-		System.out.println(this.getClass());
+		// System.out.println(this.getClass());
 		if(this.getClass().equals(o.getClass()))
 			if(this.getNummer() == ((Geschaeftsobjekt) o).getNummer())
 				return true;
