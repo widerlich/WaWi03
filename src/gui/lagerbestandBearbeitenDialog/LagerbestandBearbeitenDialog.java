@@ -70,7 +70,7 @@ public class LagerbestandBearbeitenDialog {
 			try {
 				value = Integer.parseInt(thisBesNeu.getText());
 			}catch(Exception ex) {
-				System.out.println(ex.getMessage());
+				System.out.println("Eingabe falsch, nur ganze Zahlen erlaubt. Keine Änderung.");
 			}
 			if (!(value > 0)) {
 				value = 0;

@@ -17,16 +17,12 @@ import gui.posDialog.POSDialogKundenauswahlHandler;
 import gui.posDialog.POSDialogProduktButtonHandler;
 import gui.lagerbestaendeSichtenDialog.LagerbestaendeSichtenDialog;
 import gui.lagerbestaendeSichtenDialog.LagerbestaendeSichtenDialogCloseHandler;
-import gui.lagerbestandBearbeitenDialog.LagerbestandBearbeitenDialog;
-import gui.lagerbestandBearbeitenDialog.LagerbestandBearbeitenDialogCloseHandler;
 import gui.loginDialog.LoginDialog;
 import gui.loginDialog.LoginHandler;
 
 import gui.posDialog.ProduktButton;
 import javafx.application.Application;
 import javafx.stage.Stage;
-
-
 
 /**
  * Startet die Dialoge der Anwendung und definiert für jeden Dialog
@@ -188,7 +184,6 @@ public class WaWiApp extends Application {
 				loginDialog.resetUserPW();
 				loginDialog.setError("Ungueltige Benutzername/Passwort-Kombination!", true);
 			}
-			
 		};
 		
 		loginDialog.setLoginHandler(login);

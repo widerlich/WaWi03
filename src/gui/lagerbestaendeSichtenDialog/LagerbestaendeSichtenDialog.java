@@ -58,6 +58,7 @@ public class LagerbestaendeSichtenDialog {
 	}
 	
 	public void show() {
+		tableView.refresh();
 		stage.show(); 		//AndWait();
 	}
 	
